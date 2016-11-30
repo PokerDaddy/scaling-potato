@@ -1,0 +1,5 @@
+{
+    "body" : string,
+    "nick" : string,
+    "timestamp" : int
+}
