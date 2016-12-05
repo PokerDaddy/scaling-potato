@@ -1,6 +1,6 @@
 const loki = require("lokijs");
 
-let db = new loki("data.js");
+let db = new loki("data.json");
 let messages = db.addCollection("messages");
 let sessions = db.addCollection("sessions"):
 
