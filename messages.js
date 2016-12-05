@@ -2,6 +2,7 @@ const loki = require("lokijs");
 
 let db = new loki("data.js");
 let messages = db.addCollection("messages");
+let sessions = db.addCollection("sessions"):
 
 let _exports = module.exports = {};
 
@@ -16,4 +17,15 @@ _exports.store_message = function (msg) {
 
 _exports.get_messages = function (timestamp) {
 	return messages.find( {"time" : {"$gte" : timestamp} } );
+}
+
+_exports.get_session = function (token) {
+	return sessions.find( {"token" : token} );
+}
+
+_exports.generate_session = function (session) {
+	token = require('crypto').randomBytes(16).toString('hex');
+	session.token = token;
+	
+	sessions.insert( session );
 }
