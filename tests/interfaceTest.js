@@ -1,6 +1,6 @@
 // Chat interface test
 
-const Display = require('../interface.js');
+const Display = require('../client/interface.js');
 
 let display = new Display();
 
