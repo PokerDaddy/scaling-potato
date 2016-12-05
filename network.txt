@@ -1,2 +1,8 @@
-/update/<timestamp>:
+GET /update/<timestamp>:
   Sends all messages since <timestamp>
+
+POST /send:
+  Send a message object
+
+POST /login:
+  Get a session key
