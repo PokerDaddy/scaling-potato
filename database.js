@@ -28,4 +28,6 @@ _exports.generate_session = function (session) {
 	session.token = token;
 	
 	sessions.insert( session );
+
+	return token;
 }
