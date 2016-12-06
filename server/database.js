@@ -44,7 +44,7 @@ _exports.get_session = function (token) {
 		return false;
 	}
 	
-	return clean_object(session[0]);
+	return _exports.clean_object(session[0]);
 }
 
 _exports.generate_session = function (session) {
