@@ -2,7 +2,7 @@ const loki = require("lokijs");
 
 let db = new loki("data.json");
 let messages = db.addCollection("messages");
-let sessions = db.addCollection("sessions"):
+let sessions = db.addCollection("sessions");
 
 let _exports = module.exports = {};
 
