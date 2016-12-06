@@ -44,11 +44,13 @@ _exports.clean_object = function (obj) {
 _exports.store_message = function (msg) {
 	let session = _exports.get_session(msg.token);
 
-	if (session !== false) {
+	if (session === false) {
 		return false;
 	}
 
-	delete session.token;
+	console.log(session);
+
+	msg = clone(msg);
 
 	msg = Object.assign(session, msg);
 
