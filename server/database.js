@@ -26,8 +26,6 @@ _exports.store_message = function (msg) {
 		return false;
 	}
 
-	delete session.token;
-
 	msg = Object.assign(session, msg);
 
 	messages.insert( clean_message(msg) );
@@ -43,7 +41,9 @@ _exports.get_session = function (token) {
 	if ( session.length === 0 ) {
 		return false;
 	}
-	
+
+	delete session.token;
+
 	return _exports.clean_object(session[0]);
 }
 
