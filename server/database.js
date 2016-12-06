@@ -18,6 +18,10 @@ function clean_message(msg) {
 	return msg;
 }
 
+function clean_messages(msg) {
+	return msg;
+}
+
 _exports.clean_object = function (obj) {
 	obj = clone(obj);
 	
@@ -42,7 +46,7 @@ _exports.store_message = function (msg) {
 }
 
 _exports.get_messages = function (timestamp) {
-	return clone( messages.find( {"time" : {"$gte" : timestamp} } ) );
+	return clean_messages( clone( messages.find( {"time" : {"$gte" : timestamp} } ) ) );
 }
 
 _exports.get_session = function (token) {
