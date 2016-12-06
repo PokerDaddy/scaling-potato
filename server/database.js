@@ -7,12 +7,16 @@ let sessions = db.addCollection("sessions");
 let _exports = module.exports = {};
 
 function clean_message(msg) {
+	msg = Object.assign(obj);
+
 	delete msg.secret;
 	msg.timestamp = (new Date()).getTime() / 1000;
 	return msg;
 }
 
 _exports.clean_object = function (obj) {
+	obj = Object.assign(obj);
+	
 	delete obj.meta;
 	delete obj["$loki"];
 	
@@ -42,9 +46,11 @@ _exports.get_session = function (token) {
 		return false;
 	}
 
-	delete session[0].token;
+	session = Object.assign(session[0])
 
-	return _exports.clean_object(session[0]);
+	delete session.token;
+
+	return _exports.clean_object(session);
 }
 
 _exports.generate_session = function (session) {
