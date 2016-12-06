@@ -9,6 +9,7 @@ let _exports = module.exports = {};
 function clean_message(msg) {
 	delete msg.secret;
 	msg.timestamp = (new Date()).getTime() / 1000;
+	return msg;
 }
 
 _exports.store_message = function (msg) {
