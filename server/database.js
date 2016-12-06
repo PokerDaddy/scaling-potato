@@ -14,12 +14,22 @@ function clean_message(msg) {
 	msg = clone(msg);
 
 	delete msg.secret;
-	msg.timestamp = (new Date()).getTime() / 1000;
+	msg.timestamp = Math.floor( (new Date()).getTime() / 1000 );
 	return msg;
 }
 
 function clean_messages(msg) {
-	return msg;
+	let new_messages = [];
+
+	msg.forEach( (item) => {
+		item = clone(item);
+
+		delete item.token;
+
+		new_messages.push( _exports.clean_object(item) );
+	});
+	
+	return new_messages;
 }
 
 _exports.clean_object = function (obj) {
