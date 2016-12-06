@@ -42,7 +42,7 @@ _exports.get_session = function (token) {
 		return false;
 	}
 
-	delete session.token;
+	delete session[0].token;
 
 	return _exports.clean_object(session[0]);
 }
