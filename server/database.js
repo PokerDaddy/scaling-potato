@@ -26,7 +26,7 @@ _exports.get_session = function (token) {
 _exports.generate_session = function (session) {
 	token = require('crypto').randomBytes(64).toString('hex');
 	
-	if ( typeof _exports.get_session(token) !== 'undefined' ) {
+	if ( _exports.get_session(token).length > 0 ) {
 		return _exports.generate_session(session);	
 	}
 	
