@@ -56,7 +56,7 @@ _exports.store_message = function (msg) {
 }
 
 _exports.get_messages = function (timestamp) {
-	return clean_messages( clone( messages.find( {"timestamp" : {"$gte" : timestamp} } ) ) );
+	return clean_messages( clone( messages.find( {"timestamp" : {"$gt" : timestamp} } ) ) );
 }
 
 _exports.get_session = function (token) {
