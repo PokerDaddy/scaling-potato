@@ -29,4 +29,11 @@ app.post('/login', (req, res) => {
 	res.send(JSON.stringify(session));
 });
 
+app.get('/login', (req, res) => {
+	let session = {nick : 'guest'};
+	db.generate_session(session);
+
+	res.send(JSON.stringify(session));
+});
+
 app.listen(8080);
