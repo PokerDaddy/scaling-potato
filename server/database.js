@@ -11,7 +11,7 @@ function clone(obj) {
 }
 
 function clean_message(msg) {
-	msg = clone(obj);
+	msg = clone(msg);
 
 	delete msg.secret;
 	msg.timestamp = (new Date()).getTime() / 1000;
