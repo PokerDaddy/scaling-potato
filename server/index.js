@@ -40,4 +40,10 @@ app.get('/login', (req, res) => {
 	res.send(JSON.stringify(session));
 });
 
+app.post('/user', (req, res) => {
+	let session = req.body;
+
+	res.send( db.find_session(session) );
+});
+
 app.listen(8080);
