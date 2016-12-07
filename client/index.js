@@ -8,7 +8,7 @@ let dis = new Display();
 // TODO: placeholder nick
 let nick = "Kneelawk";
 // TODO: placeholder server
-let server = "http://localhost";
+let server = "http://localhost:8080";
 let session;
 
 network.login(server, nick).on('login', (body) => {
@@ -22,7 +22,7 @@ network.login(server, nick).on('login', (body) => {
 let lastTime = 0;
 setInterval(() => {
   network.update(server, lastTime).on('response', (messages) => {
-    if (messages) {
+    if (messages && messages.length > 0) {
       messages.sort((a, b) => {
         if (a.timestamp > b.timestamp) return 1;
         else if (a.timestamp < b.timestamp) return -1;
@@ -31,6 +31,7 @@ setInterval(() => {
       messages.forEach((element) => {
         dis.recieve(element.timestamp, element.nick, element.body);
       });
+      lastTime = messages[messages.length - 1].timestamp;
     }
   }).on('error', (error) => {
     // TODO: error handling

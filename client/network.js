@@ -18,6 +18,7 @@ function login(server, nick) {
     if (error) {
       callback.emit('error', error);
     }
+    // body is already parsed because of json arg
     callback.emit('login', body);
   });
 
@@ -49,7 +50,7 @@ function update(server, timestamp) {
     if (error) {
       callback.emit('error', error);
     }
-    callback.emit('response', body);
+    callback.emit('response', JSON.parse(body));
   });
 
   return callback;
