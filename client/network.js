@@ -51,6 +51,8 @@ function update(server, timestamp) {
     }
     callback.emit('response', body);
   });
+
+  return callback;
 }
 
 module.exports = {
