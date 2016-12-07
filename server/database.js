@@ -62,7 +62,11 @@ _exports.get_messages = function (timestamp) {
 }
 
 _exports.get_session = function (token) {
-	let session = sessions.find( {"token" : token} );
+	return _exports.find_session( { token : token } );
+}
+
+_exports.find_session = function (obj) {
+	let session = sessions.find( obj );
 
 	if ( session.length === 0 ) {
 		return false;
