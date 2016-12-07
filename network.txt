@@ -1,8 +1,16 @@
 GET /update/<timestamp>:
   Sends all messages since <timestamp>
+  Returns:
+    an array of the same message objects sent with user session object merged in
 
 POST /send:
   Send a message object
 
 POST /login:
   Get a session key
+  Params:
+    POST data of a user session object
+  Returns:
+    same json object with extra fields: token and id
+
+A user session object is an object of anything that can be used to identify the user.

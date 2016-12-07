@@ -1,7 +1,60 @@
 // sends messages to server
 
 const request = require('request');
+const Callback = require('events');
+
+class LoginCallback extends Callback {}
+class SendMessageCallback extends Callback {}
+class UpdateCallback extends Callback {}
 
 function login(nick, server) {
+  let callback = new LoginCallback();
 
+  request.post(server + '/login', {
+    json: {
+      nick
+    }
+  }, (error, res, body) => {
+    if (error) {
+      callback.emit('error', error);
+    }
+    callback.emit('login', body);
+  });
+
+  return callback;
+}
+
+function sendMessage(server, session, message) {
+  let callback = new SendMessageCallback();
+
+  request.post(server + '/send', {
+    json: {
+      token: session.token,
+      message
+    }
+  }, (error, res, body) => {
+    if (error) {
+      callback.emit('error', error);
+    }
+    callback.emit('response', body);
+  });
+
+  return callback;
+}
+
+function update(server, timestamp) {
+  let callback = new UpdateCallback();
+
+  request.get(server + '/update/' + timestamp, (error, res, body) => {
+    if (error) {
+      callback.emit('error', error);
+    }
+    callback.emit('response', body);
+  });
+}
+
+module.exports = {
+  login,
+  sendMessage,
+  update
 }
