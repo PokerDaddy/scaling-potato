@@ -22,14 +22,16 @@ network.login(server, nick).on('login', (body) => {
 let lastTime = 0;
 setInterval(() => {
   network.update(server, lastTime).on('response', (messages) => {
-    messages.sort((a, b) => {
-      if (a.timestamp > b.timestamp) return 1;
-      else if (a.timestamp < b.timestamp) return -1;
-      else return 0;
-    });
-    messages.forEach((element) => {
-      dis.recieve(element.timestamp, element.nick, element.body);
-    });
+    if (messages) {
+      messages.sort((a, b) => {
+        if (a.timestamp > b.timestamp) return 1;
+        else if (a.timestamp < b.timestamp) return -1;
+        else return 0;
+      });
+      messages.forEach((element) => {
+        dis.recieve(element.timestamp, element.nick, element.body);
+      });
+    }
   }).on('error', (error) => {
     // TODO: error handling
   });
