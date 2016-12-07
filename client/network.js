@@ -7,7 +7,7 @@ class LoginCallback extends Callback {}
 class SendMessageCallback extends Callback {}
 class UpdateCallback extends Callback {}
 
-function login(nick, server) {
+function login(server, nick) {
   let callback = new LoginCallback();
 
   request.post(server + '/login', {
@@ -24,13 +24,13 @@ function login(nick, server) {
   return callback;
 }
 
-function sendMessage(server, session, message) {
+function sendMessage(server, session, body) {
   let callback = new SendMessageCallback();
 
   request.post(server + '/send', {
     json: {
       token: session.token,
-      message
+      body
     }
   }, (error, res, body) => {
     if (error) {
