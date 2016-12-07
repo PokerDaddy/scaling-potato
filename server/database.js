@@ -95,3 +95,25 @@ _exports.generate_session = function (session) {
 
 	return token;
 }
+
+_exports.update_session = function (user) {
+	let token = user.token;
+	let session = sessions.find( { token : token} );
+	let old = clone(session);
+
+	if ( session.length === 0 ) {
+		return false;
+	}
+
+	session = session[0];
+
+	for (var attrname in user) { session[attrname] = user[attrname]; }
+
+	// send notification of user update
+
+	let updated = _exports.get_session(token);
+	updated.old = old;
+	updated.body = "User data updated";
+
+	_exports.store_message(updated);
+}
