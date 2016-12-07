@@ -13,4 +13,16 @@ POST /login:
   Returns:
     same json object with extra fields: token and id
 
+GET /login:
+  Get a guest session key
+  Returns:
+    generates guest session with token and id
+
+POST /profile
+  Update your user profile
+  Params:
+    POST locally updated session object
+  Returns:
+    Echoes POST data back on success
+
 A user session object is an object of anything that can be used to identify the user.
