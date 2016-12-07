@@ -17,10 +17,8 @@ network.login(server, nick).on('login', (body) => {
   // TODO: error handling
 });
 
-// TODO: get input from user
-
 let lastTime = 0;
-setInterval(() => {
+let updateLoopId = setInterval(() => {
   network.update(server, lastTime).on('response', (messages) => {
     if (messages && messages.length > 0) {
       messages.sort((a, b) => {
@@ -38,4 +36,5 @@ setInterval(() => {
   });
 }, 1000); // checking every second should be good enough
 
+// TODO: get input from user
 // TODO: stopping the client and disconnecting
