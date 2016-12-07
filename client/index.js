@@ -12,6 +12,9 @@ let server = "http://localhost:8080";
 let session;
 
 network.login(server, nick).on('login', (body) => {
+  if (!body) {
+    // TODO: more error handling
+  }
   session = body;
 }).on('error', (error) => {
   // TODO: error handling
