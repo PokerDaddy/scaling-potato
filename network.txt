@@ -13,12 +13,19 @@ POST /login:
   Returns:
     same json object with extra fields: token and id
 
+POST /user:
+  Find a user
+  Params:
+    Any amount of information to distinguish a user
+  Returns:
+    A list of user objects that match the given query
+
 GET /login:
   Get a guest session key
   Returns:
     generates guest session with token and id
 
-POST /profile
+POST /profile:
   Update your user profile
   Params:
     POST locally updated session object
