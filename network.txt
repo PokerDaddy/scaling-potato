@@ -20,6 +20,13 @@ POST /user:
   Returns:
     The first user object matching the given query
 
+POST /users:
+  Find a list of users
+  Params:
+    Any amount of information to distinguish a user
+  Returns:
+    An array of user objects matching the given query
+
 GET /login:
   Get a guest session key
   Returns:
