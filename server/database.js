@@ -149,7 +149,7 @@ _exports.generate_session = function (session) {
 		return _exports.generate_session(session);	
 	}
 	
-	id = require('crypto').randomBytes(16).toString('hex');
+	id = require('crypto').randomBytes(2).toString('hex');
 
 	session.token = token;
 	session.id = id;
