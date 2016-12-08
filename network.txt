@@ -13,6 +13,16 @@ POST /login:
   Returns:
     same json object with extra fields: token and id
 
+POST /direct/<userid>:
+  Send a direct message to <userid>
+  Params:
+    message to be sent
+
+POST /direct:
+  Check direct message inbox
+  Params:
+    Object containing token
+
 POST /user:
   Find a user
   Params:
