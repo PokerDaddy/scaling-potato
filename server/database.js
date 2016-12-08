@@ -3,6 +3,7 @@ const loki = require("lokijs");
 let db = new loki("data.json");
 let messages = db.addCollection("messages");
 let sessions = db.addCollection("sessions");
+let direct = db.addCollection("direct");
 
 let _exports = module.exports = {};
 
@@ -43,9 +44,9 @@ function clean_message(msg) {
 function clean_messages(msg) {
 	let new_messages = [];
 
-	msg.forEach( (item) => {
-		item = clone(item);
+	msg = clone(msg)
 
+	msg.forEach( (item) => {
 		delete item.token;
 
 		new_messages.push( _exports.clean_object(item) );
@@ -100,7 +101,49 @@ _exports.store_message = function (msg) {
  * @returns {array} All messages sent since the timestamp
  */
 _exports.get_messages = function (timestamp) {
-	return clean_messages( clone( messages.find( {"timestamp" : {"$gt" : timestamp} } ) ) );
+	return clean_messages( messages.find( {"timestamp" : {"$gt" : timestamp} } ) );
+}
+
+/**
+ * Send a direct message
+ *
+ * @public
+ * @param {object} msg - Message to be sent
+ * @param {string} to - userid of user to be sent to
+ */
+_exports.store_direct = function (msg, to) {
+	let session = _exports.get_session(msg.token);
+
+	if (session === false) {
+		return false;
+	}
+
+	console.log(session);
+
+	msg = clone(msg);
+
+	msg = Object.assign(session, msg);
+
+	msg.to = to;
+
+	direct.insert( clean_message(msg) );
+}
+
+/**
+ * Get direct messages
+ *
+ * @public
+ * @param {object} req - Object containing token and timestamp
+ * @returns {array} All matching messages
+ */
+_exports.get_direct = function (req) {
+	let session = _exports.get_session(req.token);
+
+	if (session === false) { 
+		return false;
+	}
+
+	return clean_messages(clone(direct.find( { "timestamp" : {"$gt" : req.timestamp}, "to" : session.id } )));
 }
 
 /**

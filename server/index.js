@@ -24,6 +24,32 @@ app.post('/send', (req, res) => {
 	}
 });
 
+app.post('/direct/:userid', (req, res) => {
+	let msg = req.body;
+
+	console.log(msg);
+
+	if (db.store_direct(msg, req.params.userid) === false) {
+		res.status(400)
+		res.send("Invalid token")
+	} else {
+		res.send();
+	}
+});
+
+app.post('/direct', (req, res) => {
+	let obj = req.body;
+	
+	let msg = db.get_direct(obj);
+
+	if (msg === false) {
+		res.status(400)
+		res.send("Invalid token")
+	} else {
+		res.send(msg);
+	}
+});
+
 app.post('/login', (req, res) => {
 	let session = req.body;
 	db.generate_session(session);
