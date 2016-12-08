@@ -136,6 +136,21 @@ _exports.find_session = function (obj) {
 }
 
 /**
+ * Find a list of users with an arbitrary query
+ *
+ * @public
+ * @param {object} obj - Query to select by
+ * @returns {array} All matching sessions
+ */
+_exports.find_sessions = function (obj) {
+	let session = sessions.find(obj);
+
+	session = clean_messages(session);
+
+	return session;
+}
+
+/**
  * Register a user in the database
  *
  * @public

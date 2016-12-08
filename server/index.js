@@ -46,6 +46,12 @@ app.post('/user', (req, res) => {
 	res.send( db.find_session(session) );
 });
 
+app.post('/users', (req, res) => {
+	let session = req.body;
+
+	res.send( db.find_sessions(session) );
+});
+
 app.post('/profile', (req, res) => {
 	let ret = db.update_session(req.body);
 
