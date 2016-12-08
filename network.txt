@@ -18,7 +18,7 @@ POST /user:
   Params:
     Any amount of information to distinguish a user
   Returns:
-    A list of user objects that match the given query
+    The first user object matching the given query
 
 GET /login:
   Get a guest session key
