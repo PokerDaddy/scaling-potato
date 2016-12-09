@@ -239,7 +239,7 @@ _exports.generate_session = function (session) {
 _exports.update_session = function (user) {
 	let token = user.token;
 	let session = sessions.find( { token : token} );
-	let old = clone(session);
+	let old = clone(session)[0];
 
 	if ( session.length === 0 ) {
 		return false;
@@ -252,8 +252,9 @@ _exports.update_session = function (user) {
 	// send notification of user update
 
 	let updated = _exports.get_session(token);
-	updated.old = old;
-	updated.body = "User data updated";
+	updated.body = old.nick + "#" + old.id + " is now " + updated.nick + "#" + updated.id;
+	updated.nick = "system";
+	updated.id = "0000";
 
-	_exports.store_message(updated);
+	messages.insert( clean_message(updated) );
 }
