@@ -47,8 +47,6 @@ function start() {
     });
   }, 1000); // checking every second should be good enough
 
-  process.stdout.write('> ');
-
   dis.on('input', (input) => {
     if (input.startsWith('/')) {
       console.log('Commands are not implemented yet.');
@@ -61,7 +59,6 @@ function start() {
         dis.printError(error.Error);
       });
     }
-    process.stdout.write('> ');
   });
 
   dis.on('quit', () => {
