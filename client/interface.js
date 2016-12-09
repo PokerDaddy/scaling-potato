@@ -15,6 +15,7 @@ class Display extends Callback {
       input: process.stdin,
       output: process.stdout
     }).on('line', (line) => this.emit('input', line)).on('SIGINT', () => this.emit('quit'));
+    this.cli.setPrompt('');
   }
 
   recieve(timestamp, nick, body) {
