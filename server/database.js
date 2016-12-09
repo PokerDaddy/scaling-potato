@@ -207,12 +207,25 @@ _exports.generate_session = function (session) {
 		return _exports.generate_session(session);	
 	}
 	
-	id = require('crypto').randomBytes(2).toString('hex');
+	let id = require('crypto').randomBytes(2).toString('hex');
 
 	session.token = token;
 	session.id = id;
-	
+
+	let dupe = clone(session);
+
+	nick = session.nick;
+
 	sessions.insert( session );
+
+	session = clean_message(dupe);
+		
+	session.nick = "system";
+	session.id = "0000";
+
+	session.body = nick + "#" + id + " joined";
+
+	messages.insert(session);
 
 	return token;
 }
