@@ -18,8 +18,8 @@ class Display extends Callback {
     this.cli.setPrompt('');
   }
 
-  recieve(timestamp, nick, body) {
-    console.log(`[${timestamp}]${nick}: ${body}`);
+  recieve(timestamp, nick, id, body) {
+    console.log(`[${timestamp}]${nick}:${id}: ${body}`);
   }
 
   printError(error) {

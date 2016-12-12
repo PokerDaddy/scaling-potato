@@ -38,7 +38,7 @@ function start() {
           else return 0;
         });
         messages.forEach((element) => {
-          dis.recieve(element.timestamp, element.nick, element.body);
+          dis.recieve(element.timestamp, element.nick, element.id, element.body);
         });
         lastTime = messages[messages.length - 1].timestamp;
       }
