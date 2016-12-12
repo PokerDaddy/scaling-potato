@@ -51,3 +51,5 @@ class Persistence {
     });
   }
 }
+
+module.export = Persistence;
