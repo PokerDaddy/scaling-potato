@@ -57,6 +57,10 @@ dis.on('input', (line) => {
       case '/help':
         printHelp();
         break;
+      default:
+        console.log('Unrecognized command: ' + cmd[0]);
+        console.log('Use /help to list commands.');
+        break;
     }
   } else {
     sendMessage(line);
