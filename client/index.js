@@ -112,8 +112,7 @@ function connectToServer(server) {
 }
 
 function forceLogin(server, nick) {
-  let serverUrl = `http://${server}:8080`;
-  login(serverUrl, nick);
+  login(server, nick);
 }
 
 function loginToServer(server, nick) {
@@ -122,23 +121,23 @@ function loginToServer(server, nick) {
 
   if (serverData) {
     network.getUser(serverUrl, {
-      token: serverData.session.token,
-      nick
+      token: serverData.session.token
     }).on('user', (user) => {
       if (user) {
         console.log('This server remembers you. You can just /connect or login again with /forcelogin');
       } else {
-        login(serverUrl, nick);
+        login(server, nick);
       }
     }).on('error', (error) => {
       console.log('Error connecting to ' + server);
     });
   } else {
-    login(serverUrl, nick);
+    login(server, nick);
   }
 }
 
-function login(serverUrl, nick) {
+function login(server, nick) {
+  let serverUrl = `http://${server}:8080`
   console.log('Logging into: ' + server);
   network.login(serverUrl, nick).on('login', (session) => {
     console.log('Your are now logged in as: ' + session.nick + ':' + session.id);
