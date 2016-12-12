@@ -3,13 +3,14 @@
 const fs = require('fs');
 const os = require('os');
 
-const baseDir = os.homeDir() + '/.scaling-potato-client-v1/';
+const baseDir = os.homedir() + '/.scaling-potato-client-v1/';
 const validSessionName = /[0-9a-zA-Z_\-]+/;
 
 class Persistence {
   constructor(clientSessionName, fileNames) {
     this.clientSessionName = clientSessionName;
     this.fileNames = fileNames;
+    this.files = [];
   }
 
   load() {
@@ -25,7 +26,7 @@ class Persistence {
     }
 
     if (fs.existsSync(sessionDir + 'use.lock')) {
-      return 'Session "' + clientSessionName + '" is already active.';
+      return 'Session "' + this.clientSessionName + '" is already active.';
     }
 
     if (!fs.existsSync(sessionDir)) {
@@ -34,12 +35,12 @@ class Persistence {
 
     fs.writeFileSync(sessionDir + 'use.lock', 'PotatoDaddy client session lock :3');
 
-    this.fileNames.foreach((fileName) => {
+    this.fileNames.forEach((fileName) => {
       let filePath = sessionDir + '/' + fileName + '.json';
       if (fs.existsSync(filePath)) {
-        this.file[fileName] = JSON.parse(fs.readFileSync(filePath));
+        this.files[fileName] = JSON.parse(fs.readFileSync(filePath));
       } else {
-        this.file[fileName] = {};
+        this.files[fileName] = {};
       }
     });
 
@@ -47,11 +48,12 @@ class Persistence {
   }
 
   save() {
+    fs.unlinkSync(this.sessionDir + 'use.lock');
     this.fileNames.forEach((fileName) => {
       let filePath = this.sessionDir + '/' + fileName + '.json';
-      fs.writeFileSync(JSON.stringify(this.file[fileName]));
+      fs.writeFileSync(filePath, JSON.stringify(this.files[fileName]));
     });
   }
 }
 
-module.export = Persistence;
+module.exports = Persistence;

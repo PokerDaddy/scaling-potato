@@ -21,7 +21,7 @@ class CurrentServerdata {
   }
 }
 
-const pers = new Persistence(process.args[2] || 'default', ['settings', 'servers']);
+const pers = new Persistence(process.argv[2] || 'default', ['settings', 'servers']);
 
 let result = pers.load();
 if (result != 'Success.') {
@@ -42,7 +42,7 @@ dis.on('input', (line) => {
     let cmd = line.split(' ');
     switch (cmd[0]) {
       case '/login':
-        login(cmd[1], cmd[2]);
+        loginToServer(cmd[1], cmd[2]);
         break;
       case '/connect':
         connectToServer(cmd[1]);
@@ -59,6 +59,14 @@ dis.on('input', (line) => {
   }
 }).on('quit', () => {
   pers.save();
+  stopUpdateChecker();
+  process.exit(0);
+});
+
+process.on('uncaughtException', (error) => {
+  console.log(error);
+  pers.save();
+  process.exit(1);
 });
 
 function printHelp() {
@@ -116,6 +124,7 @@ function disconnectFromServer() {
   stopUpdateChecker();
   currentSession = null;
   currentServer = null;
+  console.log('Disconnected.');
 }
 
 function sendMessage(message) {
@@ -144,15 +153,25 @@ function stopUpdateChecker() {
 function checkForUpdates() {
   network.update(currentServer, currentServerData[currentServer].lastMessageTime).on('response', (publicMessages) => {
     network.updateDirects(currentServer, currentSession, currentServerData[currentServer].lastMessageTime).on('response', (directMessages) => {
-      let messages = publicMessages.concat(directMessages).sort((a, b) => {
-        if (a.timestamp > b.timestamp) return 1;
-        else if (a.timestamp < b.timestamp) return -1;
-        else return 0;
-      });
-      messages.forEach((message) => {
-        dis.recieve(message.timestamp, message.nick, message.id, message.body);
-      });
-      currentServerData[currentServer].lastMessageTime = messages[messages.length - 1].timestamp;
+      let messages;
+      if ((publicMessages && publicMessages.length > 0) && (directMessages && directMessages.length > 0)) {
+        messages = publicMessages.concat(directMessages);
+      } else if (publicMessages && publicMessages.length > 0) {
+        messages = publicMessages;
+      } else if (directMessages && directMessages.length > 0) {
+        messages = directMessages;
+      }
+      if (messages) {
+        messages.sort((a, b) => {
+          if (a.timestamp > b.timestamp) return 1;
+          else if (a.timestamp < b.timestamp) return -1;
+          else return 0;
+        });
+        messages.forEach((message) => {
+          dis.recieve(message.timestamp, message.nick, message.id, message.body);
+        });
+        currentServerData[currentServer].lastMessageTime = messages[messages.length - 1].timestamp;
+      }
     }).on('error', (error) => {
       dis.printError(error);
     });
