@@ -5,6 +5,15 @@ const network = require('./network.js');
 const Display = require('./interface.js');
 const Persistence = require('./persistence.js');
 
+const help = `
+scaling-potato help by PokerDaddy:
+Commands:
+/login <server> <nick>    - Asks <server> for a new token associated with <nick>.
+/connect <server>         - Connects to a server using a previously set token. Best used for reconnecting.
+/disconnect               - Disconnects from the current server.
+/help                     - Prints this help message.
+`;
+
 class CurrentServerdata {
   constructor(serverName) {
     this.servername = serverName;
@@ -29,10 +38,32 @@ let currentServerData = {};
 let updateCheckerId = null;
 
 dis.on('input', (line) => {
-  if ()
+  if (line.startsWith('/')) {
+    let cmd = line.split(' ');
+    switch (cmd[0]) {
+      case '/login':
+        login(cmd[1], cmd[2]);
+        break;
+      case '/connect':
+        connectToServer(cmd[1]);
+        break;
+      case '/disconnect':
+        disconnectFromServer();
+        break;
+      case '/help':
+        printHelp();
+        break;
+    }
+  } else {
+    sendMessage(line);
+  }
 }).on('quit', () => {
   pers.save();
 });
+
+function printHelp() {
+  console.log(help);
+}
 
 function connectToServer(server) {
   let serverData = pers.files.servers[server];
