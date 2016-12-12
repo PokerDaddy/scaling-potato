@@ -8,6 +8,7 @@ class SendMessageCallback extends Callback {}
 class UpdateCallback extends Callback {}
 class GetUsersCallback extends Callback {}
 class GetUserCallback extends Callback {}
+class NickChangeCallback extends Callback {}
 
 function login(server, nick) {
   let callback = new LoginCallback();
@@ -131,6 +132,22 @@ function updateDirects(server, session, timestamp) {
   return callback;
 }
 
+function changeNickname(server, newSession) {
+  let callback = new NickChangeCallback();
+
+  request.post(server + '/profile', {
+    json: newSession
+  }, (error, res, body) => {
+    if (error) {
+      callback.emit('error', error);
+      return;
+    }
+    callback.emit('response', body);
+  });
+
+  return callback;
+}
+
 module.exports = {
   login,
   sendMessage,
@@ -138,5 +155,6 @@ module.exports = {
   getUsers,
   getUser,
   update,
-  updateDirects
+  updateDirects,
+  changeNickname
 }

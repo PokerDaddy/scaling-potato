@@ -11,6 +11,7 @@ Commands:
 /login <server> <nick>      - Asks <server> for a new token associated with <nick>.
 /forcelogin <server> <nick> - Gets a new token from the server even if the server accepts your current one with <nick>.
 /connect <server>           - Connects to a server using a previously set token. Best used for reconnecting.
+/nick <nick>                - Sets your current connected user's nickname to <nick>.
 /disconnect                 - Disconnects from the current server.
 /help                       - Prints this help message.
 `;
@@ -50,6 +51,9 @@ dis.on('input', (line) => {
         break;
       case '/connect':
         connectToServer(cmd[1]);
+        break;
+      case '/nick':
+        changeNickname(cmd[1]);
         break;
       case '/disconnect':
         disconnectFromServer();
@@ -211,6 +215,19 @@ function checkForUpdates() {
   }).on('error', (error) => {
     dis.printError(error);
   });
+}
+
+function changeNickname(newNickname) {
+  if (currentSession) {
+    currentSession.nick = newNickname;
+    network.changeNickname(currentServer, currentSession).on('response', (response) => {
+      console.log(`Nickname set to ${response.nick}`);
+    }).on('error', (error) => {
+      console.log('Error setting nickname.');
+    });
+  } else {
+    console.log('You must be logged into a server to have a nickname.');
+  }
 }
 
 function sendPrivateMessageByNick(recipient, message) {
