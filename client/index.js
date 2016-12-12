@@ -8,10 +8,11 @@ const Persistence = require('./persistence.js');
 const help = `
 scaling-potato help by PokerDaddy:
 Commands:
-/login <server> <nick>    - Asks <server> for a new token associated with <nick>.
-/connect <server>         - Connects to a server using a previously set token. Best used for reconnecting.
-/disconnect               - Disconnects from the current server.
-/help                     - Prints this help message.
+/login <server> <nick>      - Asks <server> for a new token associated with <nick>.
+/forcelogin <server> <nick> - Gets a new token from the server even if the server accepts your current one with <nick>.
+/connect <server>           - Connects to a server using a previously set token. Best used for reconnecting.
+/disconnect                 - Disconnects from the current server.
+/help                       - Prints this help message.
 `;
 
 class CurrentServerdata {
@@ -43,6 +44,9 @@ dis.on('input', (line) => {
     switch (cmd[0]) {
       case '/login':
         loginToServer(cmd[1], cmd[2]);
+        break;
+      case '/forcelogin':
+        forceLogin(cmd[1], cmd[2]);
         break;
       case '/connect':
         connectToServer(cmd[1]);
@@ -103,9 +107,35 @@ function connectToServer(server) {
   }
 }
 
-function loginToServer(server, nick) {
-  console.log('Logging into: ' + server);
+function forceLogin(server, nick) {
   let serverUrl = `http://${server}:8080`;
+  login(serverUrl, nick);
+}
+
+function loginToServer(server, nick) {
+  let serverData = pers.files.servers[server];
+  let serverUrl = `http://${server}:8080`;
+
+  if (serverData) {
+    network.getUser(serverUrl, {
+      token: serverData.session.token,
+      nick
+    }).on('user', (user) => {
+      if (user) {
+        console.log('This server remembers you. You can just /connect or login again with /forcelogin');
+      } else {
+        login(serverUrl, nick);
+      }
+    }).on('error', (error) => {
+      console.log('Error connecting to ' + server);
+    });
+  } else {
+    login(serverUrl, nick);
+  }
+}
+
+function login(serverUrl, nick) {
+  console.log('Logging into: ' + server);
   network.login(serverUrl, nick).on('login', (session) => {
     console.log('Your are now logged in as: ' + session.nick + ':' + session.id);
     pers.files.servers[server] = {
