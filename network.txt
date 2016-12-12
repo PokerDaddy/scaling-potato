@@ -21,7 +21,7 @@ POST /direct/<userid>:
 POST /direct:
   Check direct message inbox
   Params:
-    Object containing token
+    Object containing token and timestamp
 
 POST /user:
   Find a user

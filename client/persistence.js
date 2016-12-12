@@ -42,6 +42,8 @@ class Persistence {
         this.file[fileName] = {};
       }
     });
+
+    return 'Success.';
   }
 
   save() {

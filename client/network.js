@@ -112,8 +112,31 @@ function update(server, timestamp) {
   return callback;
 }
 
+function updateDirects(server, session, timestamp) {
+  let callback = new UpdateCallback();
+
+  request.post(server + '/direct', {
+    json: {
+      token: session.token,
+      timestamp
+    }
+  }, (error, res, body) => {
+    if (error) {
+      callback.emit('error', error);
+      return;
+    }
+    callback.emit('response', body);
+  });
+
+  return callback;
+}
+
 module.exports = {
   login,
   sendMessage,
-  update
+  sendDirectMessage,
+  getUsers,
+  getUser,
+  update,
+  updateDirects
 }

@@ -3,26 +3,88 @@
 
 const network = require('./network.js');
 const Display = require('./interface.js');
+const Persistence = require('./persistence.js');
+
+class CurrentServerdata {
+  constructor(serverName) {
+    this.servername = serverName;
+    this.lastMessageTime = 0;
+  }
+}
+
+const pers = new Persistence(process.args[2] || 'default', ['settings', 'servers']);
+
+let result = pers.load();
+if (result != 'Success.') {
+  console.log(result);
+  process.exit(1);
+}
 
 const dis = new Display;
 
 let currentServer = null;
 let currentSession = null;
+let currentServerData = {};
+
+let updateCheckerId = null;
 
 dis.on('input', (line) => {
-
+  if ()
+}).on('quit', () => {
+  pers.save();
 });
+
+function connectToServer(server) {
+  let serverData = pers.files.servers[server];
+  let serverUrl = `http://${server}:8080`;
+  if (serverData) {
+    network.getUser(serverUrl, {
+      token: serverData.session.token
+    }).on('user', (user) => {
+      if (user) {
+        console.log('Reconnection successful.');
+        user.token = serverData.session.token;
+        pers.files.servers[server] = {
+          session: user
+        };
+        currentSession = user;
+        currentServer = serverUrl;
+        currentServerData[serverUrl] = new CurrentServerdata(server);
+        startUpdateChecker();
+      } else {
+        console.log("This server doesn't remember you.");
+        console.log('You might want to /login');
+      }
+    }).on('error', (error) => {
+      console.log('Error connecting to ' + server);
+    });
+  } else {
+    console.log('You have never logged into this server before.');
+    console.log('Maybe you will want to /login');
+  }
+}
 
 function loginToServer(server, nick) {
   console.log('Logging into: ' + server);
   let serverUrl = `http://${server}:8080`;
-  currentServer = serverUrl;
   network.login(serverUrl, nick).on('login', (session) => {
     console.log('Your are now logged in as: ' + session.nick + ':' + session.id);
+    pers.files.servers[server] = {
+      session
+    };
     currentSession = session;
+    currentServer = serverUrl;
+    currentServerData[serverUrl] = new CurrentServerdata(server);
+    startUpdateChecker();
   }).on('error', (error) => {
     console.log('Login error.');
   });
+}
+
+function disconnectFromServer() {
+  stopUpdateChecker();
+  currentSession = null;
+  currentServer = null;
 }
 
 function sendMessage(message) {
@@ -35,37 +97,78 @@ function sendMessage(message) {
   }
 }
 
-function sendPrivateMessageByNick(recipient, message) {
-  network.getUsers(server, {
-    nick: recipient
-  }).on('users', (users) => {
-    if (users && users.length > 0) {
-      if (users.length > 1) {
-        console.log('Found ' + users.length + ' users with the nick: ' + recipient);
-      }
-      users.forEach((user) => {
-        network.sendDirectMessage(server, session, user.id, message).on('response', (messageObj) => {
-          console.log('You sent to [' + user.nick + ':' + user.id + ']: ' + message);
-        }).on('error', (error) => {
-          console.log('Error sending to: ' + user.nick + ':' + user.id);
-        });
+function startUpdateChecker() {
+  if (!updateCheckerId) {
+    updateCheckerId = setInterval(checkForUpdates, 1000);
+  }
+}
+
+function stopUpdateChecker() {
+  if (updateCheckerId) {
+    clearInterval(updateCheckerId);
+    updateCheckerId = null;
+  }
+}
+
+function checkForUpdates() {
+  network.update(currentServer, currentServerData[currentServer].lastMessageTime).on('response', (publicMessages) => {
+    network.updateDirects(currentServer, currentSession, currentServerData[currentServer].lastMessageTime).on('response', (directMessages) => {
+      let messages = publicMessages.concat(directMessages).sort((a, b) => {
+        if (a.timestamp > b.timestamp) return 1;
+        else if (a.timestamp < b.timestamp) return -1;
+        else return 0;
       });
-    }
+      messages.forEach((message) => {
+        dis.recieve(message.timestamp, message.nick, message.id, message.body);
+      });
+      currentServerData[currentServer].lastMessageTime = messages[messages.length - 1].timestamp;
+    }).on('error', (error) => {
+      dis.printError(error);
+    });
   }).on('error', (error) => {
-    console.log('Error getting users from the server.');
+    dis.printError(error);
   });
 }
 
-function sendPrivateMessageById(recipientId, message) {
-  network.sendDirectMessage(server, session, recipientId, message).on('response', (messageObj) => {
-    network.getUser(server, {
-      id: recipientId
-    }).on('user', (user) => {
-      console.log('You sent to [' + user.nick + ';' + user.id + ']: ' + message);
+function sendPrivateMessageByNick(recipient, message) {
+  if (currentSession) {
+    network.getUsers(currentServer, {
+      nick: recipient
+    }).on('users', (users) => {
+      if (users && users.length > 0) {
+        if (users.length > 1) {
+          console.log('Found ' + users.length + ' users with the nick: ' + recipient);
+        }
+        users.forEach((user) => {
+          network.sendDirectMessage(currentServer, currentSession, user.id, message).on('response', (messageObj) => {
+            console.log('You sent to [' + user.nick + ':' + user.id + ']: ' + message);
+          }).on('error', (error) => {
+            console.log('Error sending to: ' + user.nick + ':' + user.id);
+          });
+        });
+      }
     }).on('error', (error) => {
-      console.log('You sent to [' + recipientId + '] (they might not exist): ' + message);
+      console.log('Error getting users from the server.');
     });
-  }).on('error', (error) => {
-    console.log('Error sending to: ' + recipientId);
-  });
+  } else {
+    console.log('You must be connected to a server to send messages.');
+  }
+}
+
+function sendPrivateMessageById(recipientId, message) {
+  if (currentSession) {
+    network.sendDirectMessage(currentServer, currentSession, recipientId, message).on('response', (messageObj) => {
+      network.getUser(currentServer, {
+        id: recipientId
+      }).on('user', (user) => {
+        console.log('You sent to [' + user.nick + ';' + user.id + ']: ' + message);
+      }).on('error', (error) => {
+        console.log('You sent to [' + recipientId + '] (they might not exist): ' + message);
+      });
+    }).on('error', (error) => {
+      console.log('Error sending to: ' + recipientId);
+    });
+  } else {
+    console.log('You must be connected to a server to send messages.');
+  }
 }
