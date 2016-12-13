@@ -3,7 +3,8 @@
 const fs = require('fs');
 const os = require('os');
 
-const baseDir = os.homedir() + '/.scaling-potato-client-v1/';
+const cache = process.env.XDG_CACHE_HOME || os.homedir() + '/.cache'
+const baseDir = cache + '/scaling-potato/';
 const validSessionName = /[0-9a-zA-Z_\-]+/;
 
 class Persistence {
