@@ -2,9 +2,10 @@
 
 const fs = require('fs');
 const os = require('os');
+const path = require('path');
 
-const cache = process.env.XDG_CACHE_HOME || os.homedir() + '/.cache'
-const baseDir = cache + '/scaling-potato/';
+const cache = process.env.XDG_CACHE_HOME || path.join(os.homedir(), '/.cache')
+const baseDir = path.join(cache, '/scaling-potato/');
 const validSessionName = /[0-9a-zA-Z_\-]+/;
 
 class Persistence {
