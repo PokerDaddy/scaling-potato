@@ -16,12 +16,12 @@ app.post('/send', (req, res) => {
 
 	console.log(msg);
 
-	if (db.store_message(msg) === false) {
-	  res.status(400)
-	  res.send("Invalid token")
-	} else {
-	  res.send();
+	msg = db.store_message(msg)
+
+	if (!msg) {
+		return res.status(400).send("Invalid token");
 	}
+	return res.send();
 });
 
 app.post('/direct/:userid', (req, res) => {
@@ -29,12 +29,10 @@ app.post('/direct/:userid', (req, res) => {
 
 	console.log(msg);
 
-	if (db.store_direct(msg, req.params.userid) === false) {
-		res.status(400)
-		res.send("Invalid token")
-	} else {
-		res.send();
+	if (!db.store_direct(msg, req.params.userid)) {
+		return res.status(400).send("Invalid token");
 	}
+	return res.send();
 });
 
 app.post('/direct', (req, res) => {
@@ -42,12 +40,10 @@ app.post('/direct', (req, res) => {
 	
 	let msg = db.get_direct(obj);
 
-	if (msg === false) {
-		res.status(400)
-		res.send("Invalid token")
-	} else {
-		res.send(msg);
+	if (!msg) {
+		return res.status(400).send("Invalid token");
 	}
+	return res.send(msg);
 });
 
 app.post('/login', (req, res) => {
@@ -81,14 +77,12 @@ app.post('/users', (req, res) => {
 app.post('/profile', (req, res) => {
 	let ret = db.update_session(req.body);
 
-	if ( ret === false ) {
-		res.status(400);
-		res.send("Invalid token");
-	} else {
-		res.send(
+	if (!ret) {
+		return res.status(400).send("Invalid token");
+	}
+	return res.send(
 			db.get_session(req.body.token)
 		);
-	}
 });
 
 app.listen(8080);
