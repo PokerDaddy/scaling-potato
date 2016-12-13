@@ -80,7 +80,7 @@ _exports.clean_object = function (obj) {
 _exports.store_message = function (msg) {
 	let session = _exports.get_session(msg.token);
 
-	if (session === false) {
+	if (!session) {
 		return false;
 	}
 
@@ -114,7 +114,7 @@ _exports.get_messages = function (timestamp) {
 _exports.store_direct = function (msg, to) {
 	let session = _exports.get_session(msg.token);
 
-	if (session === false) {
+	if (!session) {
 		return false;
 	}
 
@@ -139,7 +139,7 @@ _exports.store_direct = function (msg, to) {
 _exports.get_direct = function (req) {
 	let session = _exports.get_session(req.token);
 
-	if (session === false) { 
+	if (!session) { 
 		return false;
 	}
 
