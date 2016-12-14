@@ -19,7 +19,11 @@ class Display extends Callback {
   }
 
   recieve(timestamp, nick, id, body) {
-    console.log(`[${timestamp}]${nick}:${id}: ${body}`);
+    console.log(`[${timestamp}]${nick}#${id}: ${body}`);
+  }
+
+  recieveDirect(timestamp, nick, id, body) {
+    console.log(`[${timestamp}]Direct: ${nick}#${id}: ${body}`);
   }
 
   printError(error) {

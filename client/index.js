@@ -216,7 +216,10 @@ function checkForUpdates() {
     network.updateDirects(currentServer, currentSession, currentServerData[currentServer].lastMessageTime).on('response', (directMessages) => {
       let messages;
       if ((publicMessages && publicMessages.length > 0) && (directMessages && directMessages.length > 0)) {
-        messages = publicMessages.concat(directMessages);
+        messages = publicMessages.concat(directMessages.map((e) => {
+          e.direct = true;
+          return e;
+        }));
       } else if (publicMessages && publicMessages.length > 0) {
         messages = publicMessages;
       } else if (directMessages && directMessages.length > 0) {
@@ -229,7 +232,11 @@ function checkForUpdates() {
           else return 0;
         });
         messages.forEach((message) => {
-          dis.recieve(message.timestamp, message.nick, message.id, message.body);
+          if (message.direct) {
+            dis.recieveDirect(message.timestamp, message.nick, message.id, message.body);
+          } else {
+            dis.recieve(message.timestamp, message.nick, message.id, message.body);
+          }
         });
         currentServerData[currentServer].lastMessageTime = messages[messages.length - 1].timestamp;
       }
