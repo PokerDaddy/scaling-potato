@@ -53,25 +53,29 @@ dis.on('input', (line) => {
         connectToServer(cmd[1]);
         break;
       case '/msg':
-        if (cmd.length < 3) {
-          console.log('/msg <user-id> <message>');
-          break;
+        {
+          if (cmd.length < 3) {
+            console.log('/msg <user-id> <message>');
+            break;
+          }
+          let str = cmd[2];
+          for (let index = 3; index < cmd.length; index++) {
+            str += ' ' + cmd[index];
+          }
+          sendPrivateMessageById(cmd[1], str);
         }
-        let str = cmd[2];
-        for (let index = 3; index < cmd.length; index++) {
-          str += ' ' + cmd[index];
-        }
-        sendPrivateMessageById(cmd[1], str);
       case '/msgn':
-        if (cmd.length < 3) {
-          console.log('/msgn <nick> <message>');
-          break;
+        {
+          if (cmd.length < 3) {
+            console.log('/msgn <nick> <message>');
+            break;
+          }
+          let str = cmd[2];
+          for (let index = 3; index < cmd.length; index++) {
+            str += ' ' + cmd[index];
+          }
+          sendPrivateMessageByNick(cmd[1], str);
         }
-        let str = cmd[2];
-        for (let index = 3; index < cmd.length; index++) {
-          str += ' ' + cmd[index];
-        }
-        sendPrivateMessageByNick(cmd[1], str);
       case '/nick':
         changeNickname(cmd[1]);
         break;
