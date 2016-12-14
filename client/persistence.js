@@ -16,6 +16,10 @@ class Persistence {
   }
 
   load() {
+    if (!fs.existsSync(cache)) {
+      fs.mkdirSync(cache);
+    }
+
     if (!fs.existsSync(baseDir)) {
       fs.mkdirSync(baseDir);
     }
