@@ -91,6 +91,8 @@ _exports.store_message = function (msg) {
 	msg = Object.assign(session, msg);
 
 	messages.insert( clean_message(msg) );
+	
+	return msg;
 }
 
 /**
@@ -127,6 +129,8 @@ _exports.store_direct = function (msg, to) {
 	msg.to = to;
 
 	direct.insert( clean_message(msg) );
+
+	return msg;
 }
 
 /**
