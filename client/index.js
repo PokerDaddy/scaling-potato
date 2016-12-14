@@ -52,6 +52,26 @@ dis.on('input', (line) => {
       case '/connect':
         connectToServer(cmd[1]);
         break;
+      case '/msg':
+        if (cmd.length < 3) {
+          console.log('/msg <user-id> <message>');
+          break;
+        }
+        let str = cmd[2];
+        for (let index = 3; index < cmd.length; index++) {
+          str += ' ' + cmd[index];
+        }
+        sendPrivateMessageById(cmd[1], str);
+      case '/msgn':
+        if (cmd.length < 3) {
+          console.log('/msgn <nick> <message>');
+          break;
+        }
+        let str = cmd[2];
+        for (let index = 3; index < cmd.length; index++) {
+          str += ' ' + cmd[index];
+        }
+        sendPrivateMessageByNick(cmd[1], str);
       case '/nick':
         changeNickname(cmd[1]);
         break;
@@ -246,6 +266,8 @@ function sendPrivateMessageByNick(recipient, message) {
             console.log('Error sending to: ' + user.nick + ':' + user.id);
           });
         });
+      } else {
+        console.log('No user with the nick: ' + recipient);
       }
     }).on('error', (error) => {
       console.log('Error getting users from the server.');
@@ -261,7 +283,11 @@ function sendPrivateMessageById(recipientId, message) {
       network.getUser(currentServer, {
         id: recipientId
       }).on('user', (user) => {
-        console.log('You sent to [' + user.nick + ';' + user.id + ']: ' + message);
+        if (user) {
+          console.log('You sent to [' + user.nick + ';' + user.id + ']: ' + message);
+        } else {
+          console.log('No user with the id: ' + recipientId);
+        }
       }).on('error', (error) => {
         console.log('You sent to [' + recipientId + '] (they might not exist): ' + message);
       });
