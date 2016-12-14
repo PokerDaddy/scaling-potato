@@ -261,4 +261,6 @@ _exports.update_session = function (user) {
 	updated.id = "0000";
 
 	messages.insert( clean_message(updated) );
+
+	return updated;
 }
