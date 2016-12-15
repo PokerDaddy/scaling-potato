@@ -225,7 +225,7 @@ function checkForUpdates() {
       } else if (directMessages && directMessages.length > 0) {
         messages = directMessages;
       }
-      if (messages) {
+      if (messages && typeof(messages) == 'object') {
         messages.sort((a, b) => {
           if (a.timestamp > b.timestamp) return 1;
           else if (a.timestamp < b.timestamp) return -1;
@@ -241,10 +241,12 @@ function checkForUpdates() {
         currentServerData[currentServer].lastMessageTime = messages[messages.length - 1].timestamp;
       }
     }).on('error', (error) => {
-      dis.printError(error);
+      console.log('Server timed out.');
+      disconnectFromServer();
     });
   }).on('error', (error) => {
-    dis.printError(error);
+    console.log('Server timed out.');
+    disconnectFromServer();
   });
 }
 
