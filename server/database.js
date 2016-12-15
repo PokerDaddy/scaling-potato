@@ -1,4 +1,5 @@
 const loki = require("lokijs");
+const crypto = require("crypto");
 
 let db = new loki("data.json");
 let messages = db.addCollection("messages");
@@ -230,13 +231,13 @@ _exports.find_sessions = function (obj) {
  * @returns {string} Token for the new user
  */
 _exports.generate_session = function (session) {
-	token = require('crypto').randomBytes(64).toString('hex');
+	token = crypto.randomBytes(64).toString('hex');
 	
 	if ( _exports.get_session(token).length > 0 ) {
 		return _exports.generate_session(session);	
 	}
 	
-	let id = require('crypto').randomBytes(2).toString('hex');
+	let id = crypto.randomBytes(2).toString('hex');
 
 	session.token = token;
 	session.id = id;
