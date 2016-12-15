@@ -35,6 +35,30 @@ function clean_message(msg) {
 }
 
 /**
+ * Check if a given message is to a given id/since a given time
+ *
+ * @private
+ * @decorator
+ * @param {string} id - ID of the user to check 
+ * @param {number} timestamp - Timestamp after which to fetch
+ * @returns {function} Wrapped function for LokiJS
+ */
+function filter_messages(id, timestamp)  {
+	/**
+	 * Wrapped function to check if a given function matches the parent's
+	 * specifications.
+	 *
+	 * @private
+	 * @function
+	 * @param {object} msg - Message to be filtered
+	 * @returns {boolean} Whether the message matches the query
+	 */
+	return function(msg) {
+		return (msg.to === id && msg.timestamp > timestamp);
+	}
+}
+
+/**
  * Clean a list of messages
  * 
  * @private
@@ -147,7 +171,8 @@ _exports.get_direct = function (req) {
 		return false;
 	}
 
-	return clean_messages(clone(direct.find( { "timestamp" : {"$gt" : req.timestamp}, "to" : session.id } )));
+	return clean_messages(clone(direct.where(
+		filter_messages(session.id, req.timestamp))));
 }
 
 /**
