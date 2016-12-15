@@ -299,7 +299,7 @@ function sendPrivateMessageById(recipientId, message) {
         id: recipientId
       }).on('user', (user) => {
         if (user) {
-          console.log('You sent to [' + user.nick + ';' + user.id + ']: ' + message);
+          console.log('You sent to [' + user.nick + '#' + user.id + ']: ' + message);
         } else {
           console.log('No user with the id: ' + recipientId);
         }
