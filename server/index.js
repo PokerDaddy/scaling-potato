@@ -85,4 +85,6 @@ app.post('/profile', (req, res) => {
 		);
 });
 
+console.log( "Admin Token:", db.generate_system() );
+
 app.listen(8080);

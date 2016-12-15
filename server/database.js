@@ -261,6 +261,29 @@ _exports.generate_session = function (session) {
 }
 
 /**
+ * Generate system user
+ *
+ * @public
+ * @returns {string} Token for system user
+ */
+_exports.generate_system = function() {
+	if ( _exports.find_session( { "id" : "0000" } ) ) {
+		return false;
+	}
+
+	token = crypto.randomBytes(64).toString('hex');
+
+	let session = {
+		token : token,
+		nick : "system",
+		id : "0000"};
+
+	sessions.insert(session);
+
+	return token;
+}
+
+/**
  * Update the data for a given user
  *
  * @public
