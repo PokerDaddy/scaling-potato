@@ -168,7 +168,7 @@ function login(server, nick) {
   let serverUrl = `http://${server}:8080`
   console.log('Logging into: ' + server);
   network.login(serverUrl, nick).on('login', (session) => {
-    console.log('Your are now logged in as: ' + session.nick + ':' + session.id);
+    console.log('Your are now logged in as: ' + session.nick + '#' + session.id);
     pers.files.servers[server] = {
       session
     };
@@ -274,9 +274,9 @@ function sendPrivateMessageByNick(recipient, message) {
         }
         users.forEach((user) => {
           network.sendDirectMessage(currentServer, currentSession, user.id, message).on('response', (messageObj) => {
-            console.log('You sent to [' + user.nick + ':' + user.id + ']: ' + message);
+            console.log('You sent to [' + user.nick + '#' + user.id + ']: ' + message);
           }).on('error', (error) => {
-            console.log('Error sending to: ' + user.nick + ':' + user.id);
+            console.log('Error sending to: ' + user.nick + '#' + user.id);
           });
         });
       } else {
