@@ -64,6 +64,7 @@ dis.on('input', (line) => {
           }
           sendPrivateMessageById(cmd[1], str);
         }
+        break;
       case '/msgn':
         {
           if (cmd.length < 3) {
@@ -76,6 +77,7 @@ dis.on('input', (line) => {
           }
           sendPrivateMessageByNick(cmd[1], str);
         }
+        break;
       case '/nick':
         changeNickname(cmd[1]);
         break;
