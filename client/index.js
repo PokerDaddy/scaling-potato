@@ -170,7 +170,7 @@ function login(server, nick) {
   let serverUrl = `http://${server}:8080`
   console.log('Logging into: ' + server);
   network.login(serverUrl, nick).on('login', (session) => {
-    console.log('Your are now logged in as: ' + session.nick + '#' + session.id);
+    console.log('You are now logged in as: ' + session.nick + '#' + session.id);
     pers.files.servers[server] = {
       session
     };
