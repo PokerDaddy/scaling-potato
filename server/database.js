@@ -300,6 +300,10 @@ _exports.update_session = function (user) {
 
 	session = session[0];
 
+	if ( session.id === "0000" ) {
+		return session;
+	}
+
 	for (var attrname in user) { session[attrname] = user[attrname]; }
 
 	// send notification of user update
