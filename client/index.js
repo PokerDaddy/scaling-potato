@@ -14,6 +14,8 @@ Commands:
 /nick <nick>                - Sets your current connected user's nickname to <nick>.
 /disconnect                 - Disconnects from the current server.
 /help                       - Prints this help message.
+/msg <id> <msg>             - Send <msg> to user with id <id>
+/msgn <nick> <msg>          - Send <msg> to all users with nick <nick>
 `;
 
 class CurrentServerdata {
