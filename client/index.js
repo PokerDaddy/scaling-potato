@@ -11,6 +11,8 @@ Commands:
 /login <server> <nick>      - Asks <server> for a new token associated with <nick>.
 /forcelogin <server> <nick> - Gets a new token from the server even if the server accepts your current one with <nick>.
 /connect <server>           - Connects to a server using a previously set token. Best used for reconnecting.
+/auth <token>		    - Login as system user using <token>
+/announce <msg>		    - Send a message as system user
 /token <server> <token>	    - Connect to <server> using <token>
 /nick <nick>                - Sets your current connected user's nickname to <nick>.
 /disconnect                 - Disconnects from the current server.
@@ -39,6 +41,7 @@ const dis = new Display;
 let currentServer = null;
 let currentSession = null;
 let currentServerData = {};
+let adminToken = null;
 
 let updateCheckerId = null;
 
@@ -70,6 +73,18 @@ dis.on('input', (line) => {
           sendPrivateMessageById(cmd[1], str);
         }
         break;
+      case '/auth':
+	{
+	  authenticateAdmin(cmd[1]);
+	}
+      case '/announce':
+	{
+	  let str = cmd[1];
+	  for (let index = 2; index < cmd.length; index++) {
+            str += ' ' + cmd[index];
+	  }
+	  sendAnnouncement(str);
+	}
       case '/msgn':
         {
           if (cmd.length < 3) {
@@ -203,6 +218,32 @@ function disconnectFromServer() {
   currentSession = null;
   currentServer = null;
   console.log('Disconnected.');
+}
+
+function authenticateAdmin(token) {
+  if (currentSession) {
+    network.getUser(currentServer, {token:token}).on('user', (user) => {
+      if (user.id === "0000") {
+        adminToken = token;
+        console.log('Now authenticated as admin.')
+      } else {
+        console.log('Invalid admin token.');
+      }});
+  } else {
+    console.log('You must be connected to a server to become admin.');
+  }
+}
+
+function sendAnnouncement(message) {
+  if (currentSession && adminToken) {
+    network.sendMessage(currentServer, {token:adminToken}, message).on('error', (error) => {
+      console.log('Error sending the message.');
+    });
+  } else if (currentSession) {
+    console.log('You are not an admin.');
+  } else {
+    console.log('You must be connected to a server to send messages.');
+  }
 }
 
 function sendMessage(message) {
