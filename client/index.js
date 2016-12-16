@@ -11,6 +11,7 @@ Commands:
 /login <server> <nick>      - Asks <server> for a new token associated with <nick>.
 /forcelogin <server> <nick> - Gets a new token from the server even if the server accepts your current one with <nick>.
 /connect <server>           - Connects to a server using a previously set token. Best used for reconnecting.
+/token <server> <token>	    - Connect to <server> using <token>
 /nick <nick>                - Sets your current connected user's nickname to <nick>.
 /disconnect                 - Disconnects from the current server.
 /help                       - Prints this help message.
@@ -54,6 +55,8 @@ dis.on('input', (line) => {
       case '/connect':
         connectToServer(cmd[1]);
         break;
+      case '/token':
+	connectByToken(cmd[1], cmd[2])
       case '/msg':
         {
           if (cmd.length < 3) {
@@ -113,7 +116,7 @@ function printHelp() {
   console.log(help);
 }
 
-function _connectToServer(serverData, serverUrl) { 
+function _connectToServer(serverData, serverUrl, server) { 
   if (serverData) {
     network.getUser(serverUrl, {
       token: serverData.session.token
@@ -144,7 +147,13 @@ function _connectToServer(serverData, serverUrl) {
 function connectToServer(server) {
   let serverData = pers.files.servers[server];
   let serverUrl = `http://${server}:8080`;
-  _connectToServer(serverData, serverUrl)
+  _connectToServer(serverData, serverUrl, server)
+}
+
+function connectByToken(server, token) {
+  let serverData = {session: { token: token }};
+  let serverUrl = `http://${server}:8080`;
+  _connectToServer(serverData, serverUrl, server);
 }
 
 function forceLogin(server, nick) {
