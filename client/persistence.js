@@ -58,7 +58,7 @@ class Persistence {
       fs.unlinkSync(this.sessionDir + 'use.lock');
     } else {
       console.log("The session was unlocked during this client's use.");
-      console.log("All that client's files were overwritten with this one's.");
+      console.log("All that client's session files were overwritten with this one's.");
     }
     this.fileNames.forEach((fileName) => {
       let filePath = this.sessionDir + '/' + fileName + '.json';
