@@ -113,9 +113,7 @@ function printHelp() {
   console.log(help);
 }
 
-function connectToServer(server) {
-  let serverData = pers.files.servers[server];
-  let serverUrl = `http://${server}:8080`;
+function _connectToServer(serverData, serverUrl) { 
   if (serverData) {
     network.getUser(serverUrl, {
       token: serverData.session.token
@@ -141,6 +139,12 @@ function connectToServer(server) {
     console.log('You have never logged into this server before.');
     console.log('Maybe you will want to /login');
   }
+}
+
+function connectToServer(server) {
+  let serverData = pers.files.servers[server];
+  let serverUrl = `http://${server}:8080`;
+  _connectToServer(serverData, serverUrl)
 }
 
 function forceLogin(server, nick) {
