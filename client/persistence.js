@@ -15,7 +15,7 @@ class Persistence {
     this.files = [];
   }
 
-  load() {
+  load(force) {
     if (!fs.existsSync(cache)) {
       fs.mkdirSync(cache);
     }
@@ -28,11 +28,11 @@ class Persistence {
     this.sessionDir = sessionDir;
 
     if (validSessionName.exec(this.clientSessionName) != this.clientSessionName) {
-      return 'Session names must match the regex: /[0-9a-zA-Z_\\-]+/';
+      return 'regex-failure';
     }
 
-    if (fs.existsSync(sessionDir + 'use.lock')) {
-      return 'Session "' + this.clientSessionName + '" is already active.';
+    if (fs.existsSync(sessionDir + 'use.lock') && !force) {
+      return 'already-active';
     }
 
     if (!fs.existsSync(sessionDir)) {
@@ -50,11 +50,16 @@ class Persistence {
       }
     });
 
-    return 'Success.';
+    return 'success';
   }
 
   save() {
-    fs.unlinkSync(this.sessionDir + 'use.lock');
+    if (fs.existsSync(this.sessionDir + 'use.lock')) {
+      fs.unlinkSync(this.sessionDir + 'use.lock');
+    } else {
+      console.log("The session was unlocked during this client's use.");
+      console.log("All that client's files were overwritten with this one's.");
+    }
     this.fileNames.forEach((fileName) => {
       let filePath = this.sessionDir + '/' + fileName + '.json';
       fs.writeFileSync(filePath, JSON.stringify(this.files[fileName]));

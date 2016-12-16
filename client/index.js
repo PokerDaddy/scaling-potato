@@ -28,15 +28,40 @@ class CurrentServerdata {
   }
 }
 
-const pers = new Persistence(process.argv[2] || 'default', ['settings', 'servers']);
+const persistentFiles = ['settings', 'servers'];
 
-let result = pers.load();
-if (result != 'Success.') {
-  console.log(result);
-  process.exit(1);
-}
+let pers;
 
 const dis = new Display;
+
+function loadPersistence(curPers, force) {
+  let result = curPers.load(force);
+  switch (result) {
+    case 'success':
+      pers = curPers;
+      start();
+      break;
+    case 'regex-failure':
+      console.log('Session names must match the regex: /[0-9a-zA-Z_\\-]+/');
+      dis.askQuestion('New client session name: ').on('response', (response) => {
+        loadPersistence(new Persistence(response, persistentFiles), false);
+      });
+      break;
+    case 'already-active':
+      console.log('Session "' + curPers.clientSessionName + '" is already active.');
+      dis.askQuestion('New client session name or nothing to force the current session: ').on('response', (response) => {
+        if (response == '') {
+          loadPersistence(new Persistence(curPers.clientSessionName, persistentFiles), true);
+        } else {
+          loadPersistence(new Persistence(response, persistentFiles), false);
+        }
+      });
+      break;
+    default:
+      console.log('Error loading client sesion: ' + result);
+      process.exit(1);
+  }
+}
 
 let currentServer = null;
 let currentSession = null;
@@ -45,96 +70,101 @@ let adminToken = null;
 
 let updateCheckerId = null;
 
-dis.on('input', (line) => {
-  if (line.startsWith('/')) {
-    let cmd = line.split(' ');
-    switch (cmd[0]) {
-      case '/login':
-        loginToServer(cmd[1], cmd[2]);
-        break;
-      case '/forcelogin':
-        forceLogin(cmd[1], cmd[2]);
-        break;
-      case '/connect':
-        connectToServer(cmd[1]);
-        break;
-      case '/token':
-	connectByToken(cmd[1], cmd[2]);
-	break;
-      case '/msg':
-        {
-          if (cmd.length < 3) {
-            console.log('/msg <user-id> <message>');
-            break;
-          }
-          let str = cmd[2];
-          for (let index = 3; index < cmd.length; index++) {
-            str += ' ' + cmd[index];
-          }
-          sendPrivateMessageById(cmd[1], str);
-        }
-        break;
-      case '/auth':
-	{
-	  authenticateAdmin(cmd[1]);
-          break;
-	}
-      case '/announce':
-	{
-	  let str = cmd[1];
-	  for (let index = 2; index < cmd.length; index++) {
-            str += ' ' + cmd[index];
-	  }
-	  sendAnnouncement(str);
-	  break;
-	}
-      case '/msgn':
-        {
-          if (cmd.length < 3) {
-            console.log('/msgn <nick> <message>');
-            break;
-          }
-          let str = cmd[2];
-          for (let index = 3; index < cmd.length; index++) {
-            str += ' ' + cmd[index];
-          }
-          sendPrivateMessageByNick(cmd[1], str);
-        }
-        break;
-      case '/nick':
-        changeNickname(cmd[1]);
-        break;
-      case '/disconnect':
-        disconnectFromServer();
-        break;
-      case '/help':
-        printHelp();
-        break;
-      default:
-        console.log('Unrecognized command: ' + cmd[0]);
-        console.log('Use /help to list commands.');
-        break;
-    }
-  } else {
-    sendMessage(line);
-  }
-}).on('quit', () => {
-  pers.save();
-  stopUpdateChecker();
-  process.exit(0);
-});
+// start the whole thing
+loadPersistence(new Persistence(process.argv[2] || 'default', persistentFiles), false);
 
-process.on('uncaughtException', (error) => {
-  console.log(error);
-  pers.save();
-  process.exit(1);
-});
+function start() {
+  dis.on('input', (line) => {
+    if (line.startsWith('/')) {
+      let cmd = line.split(' ');
+      switch (cmd[0]) {
+        case '/login':
+          loginToServer(cmd[1], cmd[2]);
+          break;
+        case '/forcelogin':
+          forceLogin(cmd[1], cmd[2]);
+          break;
+        case '/connect':
+          connectToServer(cmd[1]);
+          break;
+        case '/token':
+          connectByToken(cmd[1], cmd[2]);
+          break;
+        case '/msg':
+          {
+            if (cmd.length < 3) {
+              console.log('/msg <user-id> <message>');
+              break;
+            }
+            let str = cmd[2];
+            for (let index = 3; index < cmd.length; index++) {
+              str += ' ' + cmd[index];
+            }
+            sendPrivateMessageById(cmd[1], str);
+          }
+          break;
+        case '/auth':
+          {
+            authenticateAdmin(cmd[1]);
+            break;
+          }
+        case '/announce':
+          {
+            let str = cmd[1];
+            for (let index = 2; index < cmd.length; index++) {
+              str += ' ' + cmd[index];
+            }
+            sendAnnouncement(str);
+            break;
+          }
+        case '/msgn':
+          {
+            if (cmd.length < 3) {
+              console.log('/msgn <nick> <message>');
+              break;
+            }
+            let str = cmd[2];
+            for (let index = 3; index < cmd.length; index++) {
+              str += ' ' + cmd[index];
+            }
+            sendPrivateMessageByNick(cmd[1], str);
+          }
+          break;
+        case '/nick':
+          changeNickname(cmd[1]);
+          break;
+        case '/disconnect':
+          disconnectFromServer();
+          break;
+        case '/help':
+          printHelp();
+          break;
+        default:
+          console.log('Unrecognized command: ' + cmd[0]);
+          console.log('Use /help to list commands.');
+          break;
+      }
+    } else {
+      sendMessage(line);
+    }
+  }).on('quit', () => {
+    pers.save();
+    stopUpdateChecker();
+    process.exit(0);
+  });
+
+  process.on('uncaughtException', (error) => {
+    console.log(error);
+    pers.save();
+    process.exit(1);
+  });
+}
 
 function printHelp() {
   console.log(help);
 }
 
-function _connectToServer(serverData, serverUrl, server) { 
+function _connectToServer(serverData, serverUrl, server) {
   if (serverData) {
     network.getUser(serverUrl, {
       token: serverData.session.token
@@ -169,7 +199,11 @@ function connectToServer(server) {
 }
 
 function connectByToken(server, token) {
-  let serverData = {session: { token: token }};
+  let serverData = {
+    session: {
+      token: token
+    }
+  };
   let serverUrl = `http://${server}:8080`;
   _connectToServer(serverData, serverUrl, server);
 }
@@ -225,13 +259,16 @@ function disconnectFromServer() {
 
 function authenticateAdmin(token) {
   if (currentSession) {
-    network.getUser(currentServer, {token:token}).on('user', (user) => {
+    network.getUser(currentServer, {
+      token: token
+    }).on('user', (user) => {
       if (user.id === "0000") {
         adminToken = token;
         console.log('Now authenticated as admin.')
       } else {
         console.log('Invalid admin token.');
-      }});
+      }
+    });
   } else {
     console.log('You must be connected to a server to become admin.');
   }
@@ -239,7 +276,9 @@ function authenticateAdmin(token) {
 
 function sendAnnouncement(message) {
   if (currentSession && adminToken) {
-    network.sendMessage(currentServer, {token:adminToken}, message).on('error', (error) => {
+    network.sendMessage(currentServer, {
+      token: adminToken
+    }, message).on('error', (error) => {
       console.log('Error sending the message.');
     });
   } else if (currentSession) {
