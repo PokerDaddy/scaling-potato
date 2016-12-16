@@ -59,7 +59,8 @@ dis.on('input', (line) => {
         connectToServer(cmd[1]);
         break;
       case '/token':
-	connectByToken(cmd[1], cmd[2])
+	connectByToken(cmd[1], cmd[2]);
+	break;
       case '/msg':
         {
           if (cmd.length < 3) {
@@ -76,6 +77,7 @@ dis.on('input', (line) => {
       case '/auth':
 	{
 	  authenticateAdmin(cmd[1]);
+          break;
 	}
       case '/announce':
 	{
@@ -84,6 +86,7 @@ dis.on('input', (line) => {
             str += ' ' + cmd[index];
 	  }
 	  sendAnnouncement(str);
+	  break;
 	}
       case '/msgn':
         {
