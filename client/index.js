@@ -323,7 +323,10 @@ function checkForUpdates() {
       } else if (publicMessages && publicMessages.length > 0) {
         messages = publicMessages;
       } else if (directMessages && directMessages.length > 0) {
-        messages = directMessages;
+        messages = directMessages.map((e) => {
+          e.direct = true;
+          return e;
+        });
       }
       if (messages && typeof(messages) == 'object') {
         messages.sort((a, b) => {
