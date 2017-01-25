@@ -113,7 +113,11 @@ _exports.store_message = function (msg) {
 
 	msg = clone(msg);
 
-	msg = Object.assign(session, msg);
+	if (session.id == "0000") {
+		msg = Object.assign(session, msg);
+	} else {
+		msg = Object.assign(msg, session);
+	}
 
 	messages.insert( clean_message(msg) );
 	
@@ -149,7 +153,11 @@ _exports.store_direct = function (msg, to) {
 
 	msg = clone(msg);
 
-	msg = Object.assign(session, msg);
+	if (session.id == "0000") {
+		msg = Object.assign(session, msg);
+	} else {
+		msg = Object.assign(msg, session);
+	}
 
 	msg.to = to;
 
